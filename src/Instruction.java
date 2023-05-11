@@ -7,6 +7,7 @@ public class Instruction {
     int shamt;
     int immediate;
     int address;
+    int memoryAddress;
     InstructionType instructionType;
 
     public Instruction(int instruction){
@@ -22,6 +23,7 @@ public class Instruction {
         shamt = -1;
         immediate = -1;
         address = -1;
+        memoryAddress = -1;
     }
     /*public void Fetch(RegisterFile registerFile) //add rest of logic
     {
