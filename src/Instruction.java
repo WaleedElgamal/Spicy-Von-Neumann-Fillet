@@ -129,7 +129,6 @@ public class Instruction {
             case 10:registerFile.saveRegisterValue(valR2,r1);
         }
 
-
     }
 
 
