@@ -10,7 +10,7 @@ public class Instruction {
     int memoryAddress;
     InstructionType instructionType;
 
-    public Instruction(int instruction){
+    public Instruction(int instruction){ //check
         this.instruction = instruction;
         stage = new int[5];
         opcode = -1;

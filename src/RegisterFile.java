@@ -3,7 +3,7 @@ public class RegisterFile {
     final int r0 = 0;
     int pc;
 
-    public RegisterFile(){
+    public RegisterFile(){ //check
         generalPurposeRegisters = new int[31];
         pc=0;
     }
