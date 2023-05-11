@@ -10,15 +10,14 @@ public class ALU {
             case 3:
             case 10:
             case 11: return val1 + val2;
-            case 1: return val1 - val2;
+            case 1:
+                case 4: return val1 - val2;
             case 2: return val1 * val2;
-            case 4: return 2;
             case 5: return (val1 & val2);
-            case 6: return (val1 | val2);
-            case 7: return (val1);
+            case 6: case 7: return (val1 | val2);
             case 8: return (val1 << val2);
             case 9: return (val1 >>> val2);
         }
-        return -1;
+        return -1; //?
     }
 }

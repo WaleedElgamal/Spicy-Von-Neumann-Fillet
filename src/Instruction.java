@@ -23,6 +23,10 @@ public class Instruction {
         immediate = -1;
         address = -1;
     }
+    /*public void Fetch(RegisterFile registerFile) //add rest of logic
+    {
+        registerFile.setPc(registerFile.getPc()+1);
+    }*/
 
     public void decode(RegisterFile registerFile){
         opcode = (instruction & 0b11110000000000000000000000000000) >>> 28;
@@ -64,8 +68,68 @@ public class Instruction {
     }
 
     public void execute(RegisterFile registerFile, ALU alu){
+       // int result=0;
+        switch(opcode)
+        {
+            case 0: case 1:
+                valR2=alu.execute(opcode,valR2,valR3); //add,subtract
+               // registerFile.saveRegisterValue(valR2,r1); break;
+            case 2: case 3: case 5: case 6:
+                valR2= alu.execute(opcode,valR2,immediate); //multi,addi, andi, ori
+              //  registerFile.saveRegisterValue(valR2,r1); break;
+            case 4:  valR2=alu.execute(opcode,valR2,immediate); //bne i
+                    if(valR2!=0)
+                    {
+                        int currPCValue= registerFile.getPc();
+                        valR2=alu.execute(0,currPCValue,immediate);
+                        registerFile.setPc(valR2);
+                    }
+                    break;
+            case 7: int currPCValue= registerFile.getPc(); //jump
+                    int temp = currPCValue & 0b11110000000000000000000000000000; // ask about this
+                    //temp = alu.execute(5,currPCValue,^ value in integer)
+                    valR2= alu.execute(opcode,temp,address); //print to check + fix bit issue
+                    registerFile.setPc(valR2);
+                break;
+            case 8: case 9: valR2=alu.execute(opcode,valR2,shamt); //sll,srl
+                            registerFile.saveRegisterValue(valR2,r1);
+                            break;
+           case 10: case 11:  valR2=alu.execute(opcode,valR2,immediate); //storing summation in both in valR2
+                            break;
+             //default: break;
+        }
+    }
+
+    public void memory(MainMemory mainMemory, RegisterFile registerFile)
+    {
+       // //int result=0;
+        switch(opcode)
+                {
+                    case 10:  valR2=mainMemory.getMainMemory(valR2);
+                      //  registerFile.saveRegisterValue(result,r1);
+
+                    case 11: mainMemory.setMainMemory(valR1,valR2);
+
+                }
+    }
+
+    public void writeBack(int opcode, RegisterFile registerFile)
+    {
+        switch (opcode) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 5:
+            case 6:
+            case 8:
+            case 9:
+            case 10:registerFile.saveRegisterValue(valR2,r1);
+        }
+
 
     }
+
 
 
 }

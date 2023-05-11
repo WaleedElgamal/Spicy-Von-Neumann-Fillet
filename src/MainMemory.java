@@ -4,4 +4,14 @@ public class MainMemory {
     public MainMemory(){
         mainMemory = new int[2048];
     }
+
+    public int getMainMemory(int i)
+    {
+        return mainMemory[i];
+    }
+
+    public void setMainMemory(int value, int position)
+    {
+        mainMemory[position]=value;
+    }
 }

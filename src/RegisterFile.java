@@ -37,4 +37,10 @@ public class RegisterFile {
         }
         return -1;
     }
+    public void saveRegisterValue(int value,int register){
+        if (register!=0)
+        generalPurposeRegisters[register-1]=value;
+    }
+
+
 }
