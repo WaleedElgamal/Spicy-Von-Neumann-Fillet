@@ -10,7 +10,8 @@ public class Instruction {
     int memoryAddress;
     InstructionType instructionType;
 
-    public Instruction(int instruction){ //check
+
+    public Instruction(int instruction) { //check
         this.instruction = instruction;
         stage = new int[5];
         opcode = -1;
@@ -36,27 +37,32 @@ public class Instruction {
             case 0:
             case 1:
             case 8:
-            case 9: {instructionType = InstructionType.R;
-                    r1 = (instruction & 0b00001111100000000000000000000000) >>> 23;
-                    r2 = (instruction & 0b00000000011111000000000000000000) >>> 18;
-                    r3 = (instruction & 0b00000000000000111110000000000000) >>> 13;
-                    shamt = (instruction & 0b00000000000000000001111111111111);
-                    break;}
+            case 9: {
+                instructionType = InstructionType.R;
+                break;
+            }
             case 2:
             case 3:
             case 4:
             case 5:
             case 6:
             case 10:
-            case 11: {instructionType = InstructionType.I;
-                    r1 = (instruction & 0b00001111100000000000000000000000) >>> 23;
-                    r2 = (instruction & 0b00000000011111000000000000000000) >>> 18;
-                    immediate = (instruction & 0b00000000000000111111111111111111);
-                    break;}
-            case 7: {instructionType = InstructionType.J;
-                    address = (instruction & 0b00001111111111111111111111111111);
-                    break;}
+            case 11: {
+                instructionType = InstructionType.I;
+                break;
+            }
+            case 7: {
+                instructionType = InstructionType.J;
+                break;
+            }
         }
+
+        r1 = (instruction & 0b00001111100000000000000000000000) >>> 23;
+        r2 = (instruction & 0b00000000011111000000000000000000) >>> 18;
+        r3 = (instruction & 0b00000000000000111110000000000000) >>> 13;
+        shamt = (instruction & 0b00000000000000000001111111111111);
+        immediate = (instruction & 0b00000000000000111111111111111111);
+        address = (instruction & 0b00001111111111111111111111111111);
 
         switch (instructionType){
             case R: {valR1= registerFile.getRegisterValue(r1);
@@ -133,4 +139,3 @@ public class Instruction {
 
 
 
-}
