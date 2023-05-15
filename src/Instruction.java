@@ -147,17 +147,22 @@ public class Instruction {
                 registerFile.saveRegisterValue(valR2, r1);
         }
     }
-    public void printInstruction()
+    public String printInstruction()
     {
 
         switch(this.instructionType)
         {
-            case R: System.out.println("RS: " + this.getValR2() + ", RT: " + this.getValR3() +
-                    ", RD: " + this.getValR1() + ", SHAMT: " +this.getShamt()) ; break;
-            case I: System.out.println("RS: " + this.getValR2() + ", RD: " + this.getValR1() + ", IMMEDIATE: " +this.getImmediate()) ; break;
-            case J: System.out.print("ADDRESS: " + this.getAddress());  break;
+            case R:
+                    return ("RS: " + this.getValR2() + ", RT: " + this.getValR3() +
+                    ", RD: " + this.getValR1() + ", SHAMT: " + this.getShamt() );
+            case I:
+                return ("RS: " + this.getValR2() + ", RT: " + this.getValR1() +
+                    ", IMMEDIATE: " +this.getImmediate());
+            case J:
+                return ("ADDRESS: " + this.getAddress());
 
         }
+        return "";
     }
 
     public int[] getStage() {

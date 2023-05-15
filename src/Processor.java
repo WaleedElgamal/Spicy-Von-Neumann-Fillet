@@ -219,12 +219,12 @@ public class Processor {
         //clk cycle, then the pipeline stages(Instruction & stage, input/value), register updates,
         // memory updates, registers after last clk, memory after last
         System.out.println("Current clk cycle " + cycles);
-        piplineSeq();
+        pipelineSeq();
 
 
     }
 
-    private void piplineSeq()
+    private void pipelineSeq()
     {
         String[] prints = new String[5];
         Instruction[] stages = new Instruction[5];
@@ -235,43 +235,23 @@ public class Processor {
             if (inst.getStage()[0] == 1) {
                 prints[0] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[0] = inst;
-                switch(inst.getInstructionType()){
-                    case I:
-                    case J: prints[0] += "RS: " + inst.getValR2() + " RT: " + inst.getValR3() ; break;
-                    case R: prints[0] += "No inputs"; break;
-                }
+                prints[0] += inst.printInstruction();
             } else if (inst.getStage()[1] == 1 || inst.getStage()[1] == 2) {
                 prints[1] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[1] = inst;
-                switch(inst.getInstructionType()){
-                    case I:
-                    case J: prints[1]+= "RS: " + inst.getValR2() + " RT: " + inst.getValR3() ; break;
-                    case R: prints[1]+= "No inputs"; break;
-                }
+                prints[1] += inst.printInstruction();
             } else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
                 prints[2] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[2] = inst;
-                switch(inst.getInstructionType()){
-                    case I:
-                    case J: prints[2]+= "RS: " + inst.getValR2() + " RT: " + inst.getValR3() ; break;
-                    case R: prints[2]+= "No inputs"; break;
-                }
+                prints[2] += inst.printInstruction();
             } else if (inst.getStage()[3] == 1) {
                 prints[3] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[3] = inst;
-                switch(inst.getInstructionType()){
-                    case I:
-                    case J: prints[3]+= "RS: " + inst.getValR2() + " RT: " + inst.getValR3() ; break;
-                    case R: prints[3]+= "No inputs"; break;
-                }
+                prints[3] += inst.printInstruction();
             } else if (inst.getStage()[4] == 1) {
                 prints[4] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[4] = inst;
-                switch(inst.getInstructionType()){
-                    case I:
-                    case J: prints[4]+= "RS: " + inst.getValR2() + " RT: " + inst.getValR3() ; break;
-                    case R: prints[4]+= "No inputs"; break;
-                }
+                prints[4] += inst.printInstruction();
             }
         }
         for(int i=0; i<5; i++){
