@@ -7,11 +7,12 @@ public class Instruction {
     int shamt;
     int immediate;
     int address;
-    int memoryAddress;
+    //int memoryAddress; unused
+    int pc; //need to store pc value and pass it through pipeline registers in case of a branch or jump instruction
     InstructionType instructionType;
 
 
-    public Instruction(int instruction) { //check
+    public Instruction(int instruction, int pc) { //check
         this.instruction = instruction;
         stage = new int[5];
         opcode = -1;
@@ -24,7 +25,8 @@ public class Instruction {
         shamt = -1;
         immediate = -1;
         address = -1;
-        memoryAddress = -1;
+       // memoryAddress = -1;
+        this.pc = pc;
     }
     /*public void Fetch(RegisterFile registerFile) //add rest of logic
     {
@@ -62,6 +64,7 @@ public class Instruction {
         r3 = (instruction & 0b00000000000000111110000000000000) >>> 13;
         shamt = (instruction & 0b00000000000000000001111111111111);
         immediate = (instruction & 0b00000000000000111111111111111111);
+        //todo print immediate here to check if value is negative after bitmasking, might have to do sign-extend
         address = (instruction & 0b00001111111111111111111111111111);
 
         switch (instructionType) {
@@ -85,27 +88,31 @@ public class Instruction {
             case 0:
             case 1:
                 valR2 = alu.execute(opcode, valR2, valR3); //add,subtract
-                // registerFile.saveRegisterValue(valR2,r1); break;
+                // registerFile.saveRegisterValue(valR2,r1);
+                break;
             case 2:
             case 3:
             case 5:
             case 6:
                 valR2 = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
-                //  registerFile.saveRegisterValue(valR2,r1); break;
+                //  registerFile.saveRegisterValue(valR2,r1);
+                break;
             case 4:
                 valR2 = alu.execute(opcode, valR2, immediate); //bne i
                 if (valR2 != 0) {
-                    int currPCValue = registerFile.getPc();
+                    int currPCValue = pc;  //registerFile.getPc();
                     valR2 = alu.execute(0, currPCValue, immediate);
-                    registerFile.setPc(valR2);
+                    //registerFile.setPc(valR2);
+                    pc = valR2;
                 }
                 break;
             case 7:
-                int currPCValue = registerFile.getPc(); //jump
+                int currPCValue = pc;  //registerFile.getPc(); //jump
                 int temp = currPCValue & 0b11110000000000000000000000000000; // ask about this
                 //temp = alu.execute(5,currPCValue,^ value in integer)
                 valR2 = alu.execute(opcode, temp, address); //print to check + fix bit issue
-                registerFile.setPc(valR2);
+                //registerFile.setPc(valR2);
+                pc = valR2;
                 break;
             case 8:
             case 9:
@@ -125,11 +132,12 @@ public class Instruction {
         switch (opcode) {
             case 10:
                 valR2 = mainMemory.getMainMemory(valR2);
+                break;
                 //  registerFile.saveRegisterValue(result,r1);
 
             case 11:
                 mainMemory.setMainMemory(valR1, valR2);
-
+                break;
         }
     }
 
@@ -145,6 +153,8 @@ public class Instruction {
             case 9:
             case 10:
                 registerFile.saveRegisterValue(valR2, r1);
+                valR1=valR2;
+                break;
         }
     }
     public String printInstruction()
@@ -265,12 +275,20 @@ public class Instruction {
         this.address = address;
     }
 
-    public int getMemoryAddress() {
+  /*  public int getMemoryAddress() {
         return memoryAddress;
     }
 
     public void setMemoryAddress(int memoryAddress) {
         this.memoryAddress = memoryAddress;
+    } */
+
+    public int getPc() {
+        return pc;
+    }
+
+    public void setPc(int pc) {
+        this.pc = pc;
     }
 
     public InstructionType getInstructionType() {

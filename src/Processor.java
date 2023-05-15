@@ -1,6 +1,8 @@
 import java.io.BufferedReader;
 import java.io.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Processor {
     MainMemory mainMemory;
@@ -9,6 +11,9 @@ public class Processor {
     ArrayList<Instruction> currentInstructions;
     int numOfInstructions;
     int cycles; //counts clk cycle for printing... need prints after incrementation...
+    int pc; //should be global
+    String updateRegisters;
+    String updateMemory;
 
     boolean fetch,decode,execute,memory,writeBack;
     public Processor(){
@@ -16,40 +21,57 @@ public class Processor {
         registers = new RegisterFile();
         alu = new ALU();
         currentInstructions = new ArrayList<>();
+        pc = 0;
+        updateRegisters = "";
+        updateMemory = "";
     }
 
     public void nextStageWithFetch() {
         // TODO handle fetch boolean and incrementing
         //TODO execute and decode in second clock cycle?
+        updateRegisters= "";
+        String instDetails = "";
+        String stage = "";
 
         for (int i = 0; i < currentInstructions.size(); i++) {
+            instDetails = "Instruction " + (i+1) + " in ";
+
             if(currentInstructions.get(i).getStage()[0]==0) //Fetch cycle 1
             {
+               // System.out.println("first cycle");
+                stage = "fetch";
                 currentInstructions.get(i).setStage(0,1);
             }
-           else if(currentInstructions.get(i).getStage()[0]==1) //Decode cycle 1
+          /* else if(currentInstructions.get(i).getStage()[0]==1) //Decode cycle 1
             {
                      currentInstructions.get(i).setStage(1,1);
-            }
+            }*/
             else if(currentInstructions.get(i).getStage()[1]==1) //Decode cycle 2
             {
+               // System.out.println("third cycle");
+                stage = "decode";
                 currentInstructions.get(i).decode(registers);
                 currentInstructions.get(i).setStage(1,2);
             }
-            else if(currentInstructions.get(i).getStage()[1]==2) //Execute cycle 1
+           /* else if(currentInstructions.get(i).getStage()[1]==2) //Execute cycle 1
             {
                     currentInstructions.get(i).setStage(2,1);
-            }
+            }*/
             else if(currentInstructions.get(i).getStage()[2]==1) // Execute cycle 2
             {
-                int oldPC= registers.getPc();
+               // System.out.println("fifth cycle");
+                stage = "execute";
+                int oldPC= currentInstructions.get(i).pc;     //registers.getPc();
                 currentInstructions.get(i).execute(registers,alu); //wrong types?
-                int newPC= registers.getPc();
+                int newPC=  currentInstructions.get(i).pc;     //registers.getPc();
                 currentInstructions.get(i).setStage(2,2);
                 if(oldPC!=newPC)
                 {
                   //  int oldsize= currentInstructions.size();
+                    pc = newPC;
                     flushInstructions();
+                    updateRegisters += "Updates in Registers: \n" +
+                            "Old PC: " + oldPC + ", New PC: " + newPC + "\n";
                   //  int newsize= currentInstructions.size();
                     /*if(oldsize!=newsize)
                     {
@@ -63,60 +85,110 @@ public class Processor {
             }
             else if(currentInstructions.get(i).getStage()[4]==0)//WriteBack cycle 1
             {
+                   // System.out.println("seventh cycle");
+                    stage = "write back";
+                    int oldRegValue = currentInstructions.get(i).valR1;
                     currentInstructions.get(i).writeBack(currentInstructions.get(i).getOpcode(),registers); //wrong types?
+                    int newRegValue = currentInstructions.get(i).valR1;
                     currentInstructions.get(i).setStage(4,1);
+                    if(oldRegValue!=newRegValue){
+                        int regAddress = currentInstructions.get(i).r1;
+                        updateRegisters += "Old R" + regAddress + " :" + oldRegValue + ", New R" + regAddress+ " :" + newRegValue;
+                    }
             }
-            else if(currentInstructions.get(i).getStage()[4]==1) //Finished execution
+           /* else if(currentInstructions.get(i).getStage()[4]==1) //Finished execution
             {
                 currentInstructions.remove(i);
-            }
+            }*/
+            instDetails += stage + " stage";
+            System.out.println(instDetails);
         }
+        if(!updateRegisters.equals(""))
+            System.out.println(updateRegisters);
     }
 
     public void nextStageWithoutFetch() {
+        updateRegisters = "";
+        updateMemory = "";
+        String instDetails = "";
+        String stage = "";
         for (int i = 0; i < currentInstructions.size(); i++) {
 
+            instDetails = "Instruction " + (i+1) + " in ";
             if(currentInstructions.get(i).getStage()[0]==1) //Decode cycle 1
             {
+               // System.out.println("second cycle");
+                stage = "decode";
                 currentInstructions.get(i).setStage(1,1);
+                currentInstructions.get(i).setStage(0,-1);
             }
-            else if(currentInstructions.get(i).getStage()[1]==1) //Decode cycle 2
+            /*else if(currentInstructions.get(i).getStage()[1]==1) //Decode cycle 2
             {
                 currentInstructions.get(i).decode(registers);
                 currentInstructions.get(i).setStage(1,2);
-            }
+            }*/
             else if(currentInstructions.get(i).getStage()[1]==2) //Execute cycle 1
             {
+               // System.out.println("fourth cycle");
+                stage = "execute";
                 currentInstructions.get(i).setStage(2,1);
+                currentInstructions.get(i).setStage(1,-1);
             }
-            else if(currentInstructions.get(i).getStage()[2]==1) // Execute cycle 2
+           /* else if(currentInstructions.get(i).getStage()[2]==1) // Execute cycle 2
             {
-                int oldPC= registers.getPc();
+                int oldPC= currentInstructions.get(i).pc;      //registers.getPc();
                 currentInstructions.get(i).execute(registers,alu); //wrong types?
-                int newPC= registers.getPc();
+                int newPC=  currentInstructions.get(i).pc;     //registers.getPc();
                 currentInstructions.get(i).setStage(2,2);
                 if(oldPC!=newPC)
                 {
+                    pc = newPC;
                     flushInstructions();
+                    updateRegisters += "Updates in Registers: \n" +
+                            "Old PC: " + oldPC + ", New PC: " + newPC + "\n";
                 }
-            }
+            }*/
             else if(currentInstructions.get(i).getStage()[3]==0) // Memory cycle 1
             {
+               // System.out.println("sixth cycle");
+                stage = "memory";
+                int memAddress = currentInstructions.get(i).valR2;
+                int oldMemValue = mainMemory.getMainMemory(currentInstructions.get(i).valR2);
                 currentInstructions.get(i).memory(mainMemory,registers); //wrong types?
-                currentInstructions.get(i).setStage(3,1);
+                int newMemValue  = mainMemory.getMainMemory(currentInstructions.get(i).valR2);
+                currentInstructions.get(i).setStage(3,-1);
+                if(oldMemValue!=newMemValue){
+                    updateMemory = "Updates in Memory: \n" +
+                            "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue;
+                }
             }
-            else if(currentInstructions.get(i).getStage()[4]==0) //WriteBack cycle 1
+            /*else if(currentInstructions.get(i).getStage()[4]==0) //WriteBack cycle 1
             {
+                int oldRegValue = currentInstructions.get(i).valR1;
+                System.out.println(oldRegValue);
                 currentInstructions.get(i).writeBack(currentInstructions.get(i).getOpcode(),registers); //wrong types?
+                int newRegValue = currentInstructions.get(i).valR1;
+                System.out.println(newRegValue);
                 currentInstructions.get(i).setStage(4,1);
-            }
+                if(oldRegValue!=newRegValue){
+                    int regAddress = currentInstructions.get(i).r1;
+                    updateRegisters += "Old R" + regAddress + " :" + oldRegValue + ", New R" + regAddress+ " :" + newRegValue;
+                }
+            }*/
             else if(currentInstructions.get(i).getStage()[4]==1) //Finished execution
             {
                 currentInstructions.remove(i);
+                i--; //will always remove instruction in even cycle,
+                    // so need to decrement to access next instructions in same cycle
             }
 
-
+            instDetails += stage + " stage";
+            System.out.println(instDetails);
         }
+        if(!updateRegisters.equals(""))
+            System.out.println(updateRegisters);
+        if(!updateMemory.equals(""))
+            System.out.println(updateMemory);
     }
 
     public void flushInstructions(){
@@ -150,19 +222,23 @@ public class Processor {
 
     private void parseFileIntoMemory(MainMemory memory) throws IOException {
         // todo use correct path for instruction file, use relative src/
-        File file = new File("C:\\Users\\pankaj\\Desktop\\test.txt");
+        File file = new File("/Users/waleed/Desktop/test.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         int i = 0;
         while ((st = br.readLine()) != null) {
             // todo print value after parsing
             String[] stValues = st.split(" ");
+            for(int j=0; j<stValues.length; j++){
+                stValues[j]=stValues[j].toUpperCase();
+            }
             String res = "";
             String opcode = parseOpcode(stValues[0]);
             res += opcode;
             if (stValues[0].equals("J")){
-                String temp = (Integer.parseInt(stValues[1]) & 0b00001111111111111111111111111111) + "";
-                res += temp.substring(4,temp.length());
+                String temp = Integer.toBinaryString(Integer.parseInt(stValues[1]));
+                temp = String.format("%28s", temp).replaceAll(" ", "0");
+                res += temp;
             }
             else {
                 res += parseRegister(stValues[1]);
@@ -172,14 +248,16 @@ public class Processor {
                     res += "0000000000000";
                 } else if (stValues[0].equals("SLL") || stValues[0].equals("SRL")) {
                     res += "00000";
-                    String temp = (Integer.parseInt(stValues[4]) & 0b00000000000000000001111111111111) + "";
-                    res += temp.substring(18, temp.length());
+                    String temp = Integer.toBinaryString(Integer.parseInt(stValues[4]));
+                    temp = String.format("%13s", temp).replaceAll(" ", "0");
+                    res += temp;
                 } else { //I type
-                    String temp = (Integer.parseInt(stValues[3]) & 0b00000000000000111111111111111111) + "";
-                    res += temp.substring(13, temp.length());
+                    String temp = Integer.toBinaryString(Integer.parseInt(stValues[3]));
+                    temp = String.format("%18s", temp).replaceAll(" ", "0");
+                    res += temp;
                 }
             }
-            memory.setMainMemory(Integer.parseInt(res),i);
+            memory.setMainMemory(new BigInteger(res, 2).intValue(),i);
             i++;
         }
         numOfInstructions = i; // storing the number of instructions in instruction file
@@ -190,10 +268,10 @@ public class Processor {
 
     private String parseRegister(String stValue) {
         //TODO test the return statement by printing
-        String temp = stValue.substring(1);
-        int val = Integer.parseInt(temp) -1;
-        temp =(val & 0b00000000000000000000000000011111) + "";
-        return temp.substring(27,temp.length());
+        int val = Integer.parseInt(stValue.substring(1)) ;
+        String temp = Integer.toBinaryString(val);
+        temp = String.format("%5s", temp).replaceAll(" ", "0");
+        return temp;
     }
 
     private String parseOpcode(String stValue) {
@@ -218,7 +296,7 @@ public class Processor {
     {
         //clk cycle, then the pipeline stages(Instruction & stage, input/value), register updates,
         // memory updates, registers after last clk, memory after last
-        System.out.println("Current clk cycle " + cycles);
+        //System.out.println("Current clk cycle " + cycles);
         pipelineSeq();
 
 
@@ -277,9 +355,10 @@ public class Processor {
 
 
     public void fetch(){
-        int res= this.mainMemory.getMainMemory(this.registers.getPc());
-        this.registers.setPc(this.registers.getPc()+1);
-        Instruction instruction = new Instruction(res);
+        int res= mainMemory.getMainMemory(pc);       //this.mainMemory.getMainMemory(this.registers.getPc());
+        //this.registers.setPc(this.registers.getPc()+1);
+        pc++;
+        Instruction instruction = new Instruction(res,pc);
         currentInstructions.add(instruction);
     }
 
@@ -287,14 +366,18 @@ public class Processor {
         Processor processor = new Processor();
         processor.parseFileIntoMemory(processor.mainMemory);
         int numOfClockCycles = 7 + ((processor.numOfInstructions-1)*2);
-        int clockCycle = 0;
+        int clockCycle = 1;
 
         while(clockCycle<=numOfClockCycles){
+            System.out.println("Current clock cycle: " + clockCycle);
+          //  processor.printings();
             if(clockCycle%2==1) {
                 if (processor.currentInstructions.size() < 5) {//TODO ask ta that this should automatically be satisfied{
-                    processor.fetch();
+                    if (processor.numOfInstructions > 0){
+                        processor.fetch();
+                        processor.numOfInstructions--;
+                    }
                     processor.nextStageWithFetch(); //TODO would this cause me to add more instructions than i can handle
-
                 }
             }
             else {
@@ -303,6 +386,13 @@ public class Processor {
             clockCycle++;
         }
 
+        System.out.println("Register contents after last clock cycle: \n" +
+                Arrays.toString(processor.registers.getGeneralPurposeRegisters()));
+        System.out.println("Memory contents after last clock cycle: \n" +
+                Arrays.toString(processor.mainMemory.getMainMemory()));
     }
 }
 
+/*Addi r2 r0 6
+Add r3 r1 r2
+Muli r4 r2 6*/
