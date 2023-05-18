@@ -222,7 +222,7 @@ public class Processor {
 
     private void parseFileIntoMemory(MainMemory memory) throws IOException {
         // todo use correct path for instruction file, use relative src/
-        File file = new File("/Users/waleed/Desktop/test.txt");
+        File file = new File("/src/test/test");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         int i = 0;

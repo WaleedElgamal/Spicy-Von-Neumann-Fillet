@@ -1,0 +1,3 @@
+Addi r2 r0 6
+Add r3 r1 r2
+Muli r4 r2 6
