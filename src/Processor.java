@@ -304,6 +304,8 @@ public class Processor {
         // memory updates, registers after last clk, memory after last
         //System.out.println("Current clk cycle " + cycles);
         pipelineSeq();
+      //  updatedRegisters();
+       // memoryUpdate();
 
 
     }
@@ -356,13 +358,57 @@ public class Processor {
                 "\n Memory: "+ prints[3]+
                 "\n Write back: " + prints[4]);
     }
+    //handed in the next stage
+   /* private void updatedRegisters(){
+        System.out.println("Updated registers: ");
+        for (Instruction inst:
+                currentInstructions) {
+            swtich(inst.getOpcode()) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 5:
+                case 6:
+                case 8:
+                case 9:
+                case 10:
+                    System.out.println("Instruction " (inst.getAddress() + 1) + " has updated register " +
+                        inst.getR1() + " with value: " + inst.getValR1());
+            }
+        }
+    }
+    private void memoryUpdate(){
+        System.out.println("Updated memory: ");
+        for (Instruction inst:
+                currentInstructions) {
+            swtich(inst.getOpcode()){
+                case 11:
+                    System.out.println("Instruction " (inst.getAddress() + 1) + " has updated memory address " +
+                        (inst.getValR2() + inst.getImmediate()) + " with value: " + inst.getValR1());
+            }
+        }
+    } */
 
-
+    //handled below
+    /*
+    private void printReg(){
+        System.out.println("Registers now:");
+        System.out.println("R0: 0");
+        for(int i= 1; i <=31: i++){
+            System.out.println("R" + i + " : " + registers.get(i));
+        }
+        System.out.println("PC:" + pc);
+    }
+    private void printMem(){
+        for (int i=0; i<=2047; i++){
+            System.out.println("Memory address " + i + ": " + mainMemory.getMainMemory(i));
+        }
+    }
+    */
 
    // either we call fetch after calling nextStage with fetch so all the others get executed
     // or we call fetch in nextSTagewithFetch and put the if condition that if i+1=size then i call fetch else the other if conditions
-
-
 
 
     public void fetch(){
@@ -380,8 +426,7 @@ public class Processor {
         int clockCycle = 1;
 
         while(clockCycle<=numOfClockCycles){
-            System.out.println("Current clock cycle: " + clockCycle);
-          //  processor.printings();
+            System.out.println("-----CURRENT CLOCK CYCLE: " + clockCycle);
             if(clockCycle%2==1) {
                 if (processor.currentInstructions.size() < 5) {//TODO ask ta that this should automatically be satisfied{
                     if (processor.numOfInstructions > 0){
@@ -394,6 +439,7 @@ public class Processor {
             else {
                 processor.nextStageWithoutFetch();
             }
+            processor.pipelineSeq();
             clockCycle++;
         }
 
