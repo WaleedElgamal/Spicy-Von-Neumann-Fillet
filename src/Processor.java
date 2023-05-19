@@ -29,12 +29,12 @@ public class Processor {
     public void nextStageWithFetch() {
         // TODO handle fetch boolean and incrementing
         //TODO execute and decode in second clock cycle?
-        updateRegisters= "";
+        updateRegisters= "Updates in Registers: ";
         String instDetails = "";
         String stage = "";
 
         for (int i = 0; i < currentInstructions.size(); i++) {
-            instDetails = "Instruction " + (i+1) + " in ";
+            instDetails = "Instruction " + currentInstructions.get(i).getInstructionID() + " in ";
 
             if(currentInstructions.get(i).getStage()[0]==0) //Fetch cycle 1
             {
@@ -85,6 +85,7 @@ public class Processor {
             else if(currentInstructions.get(i).getStage()[4]==0)//WriteBack cycle 1
             {
                    // System.out.println("seventh cycle");
+                    currentInstructions.get(i).setStage(3,-1);
                     stage = "write back";
                     int oldRegValue = currentInstructions.get(i).valR1;
                     currentInstructions.get(i).writeBack(currentInstructions.get(i).getOpcode(),registers); //wrong types?
@@ -103,18 +104,18 @@ public class Processor {
             { instDetails += stage + " stage";
             System.out.println(instDetails);}
         }
-        if(!updateRegisters.equals(""))
+        if(!updateRegisters.equals("Updates in Registers: "))
             System.out.println(updateRegisters);
     }
 
     public void nextStageWithoutFetch() {
-        updateRegisters = "";
+        updateRegisters = "Updates in Registers: ";
         updateMemory = "";
         String instDetails = "";
         String stage = "";
         for (int i = 0; i < currentInstructions.size(); i++) {
 
-            instDetails = "Instruction " + (i+1) + " in ";
+            instDetails = "Instruction " + currentInstructions.get(i).getInstructionID() + " in ";
             if(currentInstructions.get(i).getStage()[0]==1) //Decode cycle 1
             {
                // System.out.println("second cycle");
@@ -156,12 +157,14 @@ public class Processor {
 
                 }
                // System.out.println("sixth cycle");
+                currentInstructions.get(i).setStage(2,-1);
                 stage = "memory";
-                int memAddress = currentInstructions.get(i).valR2;
-                int oldMemValue = mainMemory.getMainMemory(currentInstructions.get(i).valR2);
+                int memAddress = currentInstructions.get(i).tempValue;
+                System.out.println("memAdress : " + memAddress );
+                int oldMemValue = mainMemory.getMainMemory(currentInstructions.get(i).tempValue);
                 currentInstructions.get(i).memory(mainMemory,registers); //wrong types?
-                int newMemValue  = mainMemory.getMainMemory(currentInstructions.get(i).valR2);
-                currentInstructions.get(i).setStage(3,-1);
+                int newMemValue  = mainMemory.getMainMemory(currentInstructions.get(i).tempValue);
+                currentInstructions.get(i).setStage(3,1);
                 if(oldMemValue!=newMemValue){
                     updateMemory = "Updates in Memory: \n" +
                             "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue + " Mem stage of Instruction " + currentInstructions.get(i).getInstructionID();;
@@ -191,7 +194,7 @@ public class Processor {
             {   instDetails += stage + " stage";
                 System.out.println(instDetails); }
         }
-        if(!updateRegisters.equals(""))
+        if(!updateRegisters.equals("Updates in Registers: "))
             System.out.println(updateRegisters);
         if(!updateMemory.equals(""))
             System.out.println(updateMemory);
@@ -238,6 +241,7 @@ public class Processor {
             for(int j=0; j<stValues.length; j++){
                 stValues[j]=stValues[j].toUpperCase();
             }
+            //System.out.println(Arrays.toString(stValues));
             String res = "";
             String opcode = parseOpcode(stValues[0]);
             res += opcode;
@@ -288,7 +292,7 @@ public class Processor {
             case "ADDI" : return "0011";
             case "BNE" : return "0100";
             case "ANDI" : return "0101";
-            case "OR" : return "0110";
+            case "ORI" : return "0110";
             case "J" : return "0111";
             case "SLL" : return "1000";
             case "SRL" : return "1001";
@@ -317,9 +321,12 @@ public class Processor {
 
         for(int i =0; i< currentInstructions.size(); i++) {
             Instruction inst = currentInstructions.get(i);
+//            System.out.println(inst.getInstructionID());
+//            System.out.println(inst.getStage()[0] + " "+ inst.getStage()[1] + " " + inst.getStage()[2] + " " + inst.getStage()[3]);
+//            System.out.println(inst.getStage()[4]);
             //instruction & stage
             if (inst.getStage()[0] == 1) {
-                prints[0] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
+                prints[0] = "Instruction " + (inst.getInstructionID());
                 stages[0] = inst;
                // prints[0] += inst.printInstruction(); TODO make a method for the first cycle that prints all maybe
             } else if (inst.getStage()[1] == 1  ) {
@@ -335,15 +342,15 @@ public class Processor {
             else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
                 prints[2] = "Instruction " + (inst.getInstructionID()) ;
                 stages[2] = inst;
-                prints[2] += inst.printInstruction();
+                prints[2] +=  ". Parameters: " + inst.printInstruction();
             } else if (inst.getStage()[3] == 1) {
-                prints[3] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
+                prints[3] = "Instruction " + (inst.getInstructionID()) ;
                 stages[3] = inst;
-                prints[3] += inst.printInstruction();
+                prints[3] += ". Parameters: " + inst.printInstruction();
             } else if (inst.getStage()[4] == 1) {
-                prints[4] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
+                prints[4] = "Instruction " + (inst.getInstructionID()) ;
                 stages[4] = inst;
-                prints[4] += inst.printInstruction();
+                prints[4] += ". Parameters: " + inst.printInstruction();
             }
         }
         for(int i=0; i<5; i++){

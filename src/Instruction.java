@@ -7,7 +7,7 @@ public class Instruction {
     int shamt;
     int immediate;
     int address;
-    //int memoryAddress; unused
+    int tempValue;
     int pc; //need to store pc value and pass it through pipeline registers in case of a branch or jump instruction
     InstructionType instructionType;
     static int instructionCount =0;
@@ -130,41 +130,41 @@ public class Instruction {
         switch (opcode) {
             case 0:
             case 1:
-                valR2 = alu.execute(opcode, valR2, valR3); //add,subtract
+                tempValue = alu.execute(opcode, valR2, valR3); //add,subtract
                 // registerFile.saveRegisterValue(valR2,r1);
                 break;
             case 2:
             case 3:
             case 5:
             case 6:
-                valR2 = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
+                tempValue = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
                 //  registerFile.saveRegisterValue(valR2,r1);
                 break;
             case 4:
-                valR2 = alu.execute(opcode, valR2, immediate); //bne i
-                if (valR2 != 0) {
+                tempValue = alu.execute(opcode, valR2, immediate); //bne i
+                if (tempValue != 0) {
                     int currPCValue = pc;  //registerFile.getPc();
-                    valR2 = alu.execute(0, currPCValue, immediate);
+                    tempValue = alu.execute(0, currPCValue, immediate);
                     //registerFile.setPc(valR2);
-                    pc = valR2;
+                    pc = tempValue;
                 }
                 break;
             case 7:
                 int currPCValue = pc;  //registerFile.getPc(); //jump
                 int temp = currPCValue & 0b11110000000000000000000000000000; // ask about this
                 //temp = alu.execute(5,currPCValue,^ value in integer)
-                valR2 = alu.execute(opcode, temp, address); //print to check + fix bit issue
+                tempValue = alu.execute(opcode, temp, address); //print to check + fix bit issue
                 //registerFile.setPc(valR2);
-                pc = valR2;
+                pc = tempValue;
                 break;
             case 8:
             case 9:
-                valR2 = alu.execute(opcode, valR2, shamt); //sll,srl
+                tempValue = alu.execute(opcode, valR2, shamt); //sll,srl
                // registerFile.saveRegisterValue(valR2, r1);
                 break;
             case 10:
             case 11:
-                valR2 = alu.execute(opcode, valR2, immediate); //storing summation in both in valR2
+                tempValue = alu.execute(opcode, valR2, immediate); //storing summation in both in valR2
                 break;
             //default: break;
         }
@@ -174,12 +174,12 @@ public class Instruction {
         // //int result=0;
         switch (opcode) {
             case 10:
-                valR2 = mainMemory.getMainMemory(valR2);
+                tempValue = mainMemory.getMainMemory(tempValue);
                 break;
                 //  registerFile.saveRegisterValue(result,r1);
 
             case 11:
-                mainMemory.setMainMemory(valR1, valR2);
+                mainMemory.setMainMemory(valR1, tempValue);
                 break;
         }
     }
@@ -195,8 +195,8 @@ public class Instruction {
             case 8:
             case 9:
             case 10:
-                registerFile.saveRegisterValue(valR2, r1);
-                valR1=valR2;
+                registerFile.saveRegisterValue(tempValue, r1);
+                valR1=tempValue;
                 break;
         }
     }
