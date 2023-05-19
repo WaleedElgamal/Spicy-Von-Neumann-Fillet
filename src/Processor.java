@@ -69,9 +69,8 @@ public class Processor {
                 {
                   //  int oldsize= currentInstructions.size();
                     pc = newPC;
-                    flushInstructions();
-                    updateRegisters += "Updates in Registers: \n" +
-                            "Old PC: " + oldPC + ", New PC: " + newPC + "\n";
+                    currentInstructions.get(i).setFlush(true);
+                    updateRegisters +=  "\n Old PC: " + oldPC + ", New PC: " + newPC + " Exec 2nd cycle stage of Instruction " + currentInstructions.get(i).getInstructionID();
                   //  int newsize= currentInstructions.size();
                     /*if(oldsize!=newsize)
                     {
@@ -93,15 +92,16 @@ public class Processor {
                     currentInstructions.get(i).setStage(4,1);
                     if(oldRegValue!=newRegValue){
                         int regAddress = currentInstructions.get(i).r1;
-                        updateRegisters += "Old R" + regAddress + " :" + oldRegValue + ", New R" + regAddress+ " :" + newRegValue;
+                        updateRegisters += "\n Old R" + regAddress + ": " + oldRegValue + ", New R" + regAddress+ ": " + newRegValue + " WB stage of Instruction " + currentInstructions.get(i).getInstructionID();
                     }
             }
            /* else if(currentInstructions.get(i).getStage()[4]==1) //Finished execution
             {
                 currentInstructions.remove(i);
             }*/
-            instDetails += stage + " stage";
-            System.out.println(instDetails);
+            if(stage!="")
+            { instDetails += stage + " stage";
+            System.out.println(instDetails);}
         }
         if(!updateRegisters.equals(""))
             System.out.println(updateRegisters);
@@ -150,6 +150,11 @@ public class Processor {
             }*/
             else if(currentInstructions.get(i).getStage()[3]==0) // Memory cycle 1
             {
+                if(currentInstructions.get(i).isFlush()){
+                    currentInstructions.get(i).setFlush(false);
+                    flushInstructions();
+
+                }
                // System.out.println("sixth cycle");
                 stage = "memory";
                 int memAddress = currentInstructions.get(i).valR2;
@@ -159,7 +164,7 @@ public class Processor {
                 currentInstructions.get(i).setStage(3,-1);
                 if(oldMemValue!=newMemValue){
                     updateMemory = "Updates in Memory: \n" +
-                            "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue;
+                            "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue + " Mem stage of Instruction " + currentInstructions.get(i).getInstructionID();;
                 }
             }
             /*else if(currentInstructions.get(i).getStage()[4]==0) //WriteBack cycle 1
@@ -182,8 +187,9 @@ public class Processor {
                     // so need to decrement to access next instructions in same cycle
             }
 
-            instDetails += stage + " stage";
-            System.out.println(instDetails);
+            if(stage!="")
+            {   instDetails += stage + " stage";
+                System.out.println(instDetails); }
         }
         if(!updateRegisters.equals(""))
             System.out.println(updateRegisters);
@@ -222,7 +228,7 @@ public class Processor {
 
     private void parseFileIntoMemory(MainMemory memory) throws IOException {
         // todo use correct path for instruction file, use relative src/
-        File file = new File("/src/test/test");
+        File file = new File("src/test/test");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String st;
         int i = 0;
@@ -313,13 +319,19 @@ public class Processor {
             if (inst.getStage()[0] == 1) {
                 prints[0] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
                 stages[0] = inst;
-                prints[0] += inst.printInstruction();
-            } else if (inst.getStage()[1] == 1 || inst.getStage()[1] == 2) {
-                prints[1] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
+               // prints[0] += inst.printInstruction(); TODO make a method for the first cycle that prints all maybe
+            } else if (inst.getStage()[1] == 1  ) {
+                prints[1] = "Instruction " + (inst.getInstructionID()) ;
                 stages[1] = inst;
-                prints[1] += inst.printInstruction();
-            } else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
-                prints[2] += "Instruction " + (inst.getAddress() + 1) + ". Parameters: ";
+               // prints[1] += inst.printInstruction();TODO make a method for the first cycle that prints all maybe
+            }
+            else if (inst.getStage()[1] == 2) { //FIXME I added forstage of [1]==2 so we can test run without null pointer exception
+                prints[1] = "Instruction " + (inst.getInstructionID()) ;
+                stages[1] = inst;
+                // prints[1] += inst.printInstruction();
+            }
+            else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
+                prints[2] = "Instruction " + (inst.getInstructionID()) ;
                 stages[2] = inst;
                 prints[2] += inst.printInstruction();
             } else if (inst.getStage()[3] == 1) {
@@ -333,11 +345,10 @@ public class Processor {
             }
         }
         for(int i=0; i<5; i++){
-            if( stages[i]== null){
-                prints[i] += "None";
+            if( stages[i] == null){
+                prints[i] = "None";
             }
         }
-
         System.out.println("Pipeline Stages: ");
         System.out.println("Instruction Fetch: " + prints[0]+
                 "\n Instruction Decode: " + prints[1] +
@@ -396,3 +407,4 @@ public class Processor {
 /*Addi r2 r0 6
 Add r3 r1 r2
 Muli r4 r2 6*/
+

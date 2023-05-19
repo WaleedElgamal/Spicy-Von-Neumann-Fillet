@@ -10,8 +10,14 @@ public class Instruction {
     //int memoryAddress; unused
     int pc; //need to store pc value and pass it through pipeline registers in case of a branch or jump instruction
     InstructionType instructionType;
+    static int instructionCount =0;
 
 
+    boolean flush=false;
+
+
+
+    int instructionID;
     public Instruction(int instruction, int pc) { //check
         this.instruction = instruction;
         stage = new int[5];
@@ -25,9 +31,46 @@ public class Instruction {
         shamt = -1;
         immediate = -1;
         address = -1;
-       // memoryAddress = -1;
+        tempValue = -1;
         this.pc = pc;
+        instructionCount+=1;
+        instructionID= instructionCount;
     }
+    public static int getInstructionCount() {
+        return instructionCount;
+    }
+
+    public static void setInstructionCount(int instructionCount) {
+        Instruction.instructionCount = instructionCount;
+    }
+    public int getTempValue() {
+        return tempValue;
+    }
+
+    public void setTempValue(int tempValue) {
+        this.tempValue = tempValue;
+    }
+
+    public boolean isFlush() {
+        return flush;
+    }
+
+    public void setFlush(boolean flush) {
+        this.flush = flush;
+    }
+
+    public int getInstructionID() {
+        return instructionID;
+    }
+
+    public void setInstructionID(int instructionID) {
+        this.instructionID = instructionID;
+    }
+
+
+
+
+
     /*public void Fetch(RegisterFile registerFile) //add rest of logic
     {
         registerFile.setPc(registerFile.getPc()+1);
