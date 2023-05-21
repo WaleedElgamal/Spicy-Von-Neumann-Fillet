@@ -11,13 +11,10 @@ public class Instruction {
     int pc; //need to store pc value and pass it through pipeline registers in case of a branch or jump instruction
     InstructionType instructionType;
     static int instructionCount =0;
-
-
     boolean flush=false;
-
-
-
     int instructionID;
+    int checkBit;
+
     public Instruction(int instruction, int pc) { //check
         this.instruction = instruction;
         stage = new int[5];
@@ -67,15 +64,6 @@ public class Instruction {
         this.instructionID = instructionID;
     }
 
-
-
-
-
-    /*public void Fetch(RegisterFile registerFile) //add rest of logic
-    {
-        registerFile.setPc(registerFile.getPc()+1);
-    }*/
-
     public void decode(RegisterFile registerFile) {
         opcode = (instruction & 0b11110000000000000000000000000000) >>> 28;
         switch (opcode) {
@@ -106,7 +94,12 @@ public class Instruction {
         r2 = (instruction & 0b00000000011111000000000000000000) >>> 18;
         r3 = (instruction & 0b00000000000000111110000000000000) >>> 13;
         shamt = (instruction & 0b00000000000000000001111111111111);
+        checkBit = (instruction & 0b000000000000001000000000000000) >>> 15;
         immediate = (instruction & 0b00000000000000111111111111111111);
+        if(checkBit== 1) {
+
+            immediate = (instruction | 0b11111111111111000000000000000000);
+        }
         //todo print immediate here to check if value is negative after bitmasking, might have to do sign-extend
         address = (instruction & 0b00001111111111111111111111111111);
 
@@ -131,36 +124,30 @@ public class Instruction {
             case 0:
             case 1:
                 tempValue = alu.execute(opcode, valR2, valR3); //add,subtract
-                // registerFile.saveRegisterValue(valR2,r1);
                 break;
             case 2:
             case 3:
             case 5:
             case 6:
                 tempValue = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
-                //  registerFile.saveRegisterValue(valR2,r1);
                 break;
             case 4:
                 tempValue = alu.execute(opcode, valR2, immediate); //bne i
                 if (tempValue != 0) {
                     int currPCValue = pc;  //registerFile.getPc();
                     tempValue = alu.execute(0, currPCValue, immediate);
-                    //registerFile.setPc(valR2);
                     pc = tempValue;
                 }
                 break;
             case 7:
                 int currPCValue = pc;  //registerFile.getPc(); //jump
                 int temp = currPCValue & 0b11110000000000000000000000000000; // ask about this
-                //temp = alu.execute(5,currPCValue,^ value in integer)
                 tempValue = alu.execute(opcode, temp, address); //print to check + fix bit issue
-                //registerFile.setPc(valR2);
                 pc = tempValue;
                 break;
             case 8:
             case 9:
                 tempValue = alu.execute(opcode, valR2, shamt); //sll,srl
-               // registerFile.saveRegisterValue(valR2, r1);
                 break;
             case 10:
             case 11:
@@ -171,13 +158,10 @@ public class Instruction {
     }
 
     public void memory(MainMemory mainMemory, RegisterFile registerFile) {
-        // //int result=0;
         switch (opcode) {
             case 10:
                 tempValue = mainMemory.getMainMemory(tempValue);
                 break;
-                //  registerFile.saveRegisterValue(result,r1);
-
             case 11:
                 mainMemory.setMainMemory(valR1, tempValue);
                 break;
@@ -194,11 +178,12 @@ public class Instruction {
             case 6:
             case 8:
             case 9:
-            case 10:
+            case 10: {
                 registerFile.saveRegisterValue(tempValue, r1);
                 if (r1 != 0)
                     valR1 = tempValue;
                 break;
+            }
         }
     }
     public String printInstruction()
@@ -217,6 +202,11 @@ public class Instruction {
 
         }
         return "";
+    }
+
+    public static int twosComplement(final int value) {
+        final int mask = 0xffff_ffff;
+        return (value ^ mask) + 1;
     }
 
     public int[] getStage() {
@@ -318,14 +308,6 @@ public class Instruction {
     public void setAddress(int address) {
         this.address = address;
     }
-
-  /*  public int getMemoryAddress() {
-        return memoryAddress;
-    }
-
-    public void setMemoryAddress(int memoryAddress) {
-        this.memoryAddress = memoryAddress;
-    } */
 
     public int getPc() {
         return pc;

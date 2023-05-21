@@ -15,6 +15,6 @@ public class MainMemory {
 
     public void setMainMemory(int value, int position)
     {
-        mainMemory[position]=value;
+        mainMemory[position] = value;
     }
 }
