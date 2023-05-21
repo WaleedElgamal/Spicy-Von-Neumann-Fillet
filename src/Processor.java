@@ -159,15 +159,16 @@ public class Processor {
                // System.out.println("sixth cycle");
                 currentInstructions.get(i).setStage(2,-1);
                 stage = "memory";
-                int memAddress = currentInstructions.get(i).tempValue;
-                System.out.println("memAdress : " + memAddress );
-                int oldMemValue = mainMemory.getMainMemory(currentInstructions.get(i).tempValue);
-                currentInstructions.get(i).memory(mainMemory,registers); //wrong types?
-                int newMemValue  = mainMemory.getMainMemory(currentInstructions.get(i).tempValue);
-                currentInstructions.get(i).setStage(3,1);
-                if(oldMemValue!=newMemValue){
-                    updateMemory = "Updates in Memory: \n" +
-                            "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue + " Mem stage of Instruction " + currentInstructions.get(i).getInstructionID();;
+                if (currentInstructions.get(i).opcode == 10 || currentInstructions.get(i).opcode == 11) {
+                    int memAddress = currentInstructions.get(i).tempValue;
+                    System.out.println("temp Value: " + memAddress);
+                    int oldMemValue = mainMemory.getMainMemory(memAddress);
+                    currentInstructions.get(i).memory(mainMemory, registers); //wrong types?
+                    int newMemValue = mainMemory.getMainMemory(memAddress);
+                    if (oldMemValue != newMemValue) {
+                        updateMemory = "Updates in Memory: \n" +
+                                "Change in address: " + memAddress + " from value: " + oldMemValue + " to value: " + newMemValue + " Mem stage of Instruction " + currentInstructions.get(i).getInstructionID();
+                    }
                 }
             }
             /*else if(currentInstructions.get(i).getStage()[4]==0) //WriteBack cycle 1
@@ -258,7 +259,7 @@ public class Processor {
                     res += "0000000000000";
                 } else if (stValues[0].equals("SLL") || stValues[0].equals("SRL")) {
                     res += "00000";
-                    String temp = Integer.toBinaryString(Integer.parseInt(stValues[4]));
+                    String temp = Integer.toBinaryString(Integer.parseInt(stValues[3]));
                     temp = String.format("%13s", temp).replaceAll(" ", "0");
                     res += temp;
                 } else { //I type
@@ -358,8 +359,8 @@ public class Processor {
                 prints[i] = "None";
             }
         }
-        System.out.println("Pipeline Stages: ");
-        System.out.println("Instruction Fetch: " + prints[0]+
+        System.out.println("Pipeline Stages:  ");
+        System.out.println(" Instruction Fetch: " + prints[0]+
                 "\n Instruction Decode: " + prints[1] +
                 "\n Execute: " + prints[2]+
                 "\n Memory: "+ prints[3]+

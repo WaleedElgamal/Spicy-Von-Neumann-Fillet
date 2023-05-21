@@ -196,7 +196,8 @@ public class Instruction {
             case 9:
             case 10:
                 registerFile.saveRegisterValue(tempValue, r1);
-                valR1=tempValue;
+                if (r1 != 0)
+                    valR1 = tempValue;
                 break;
         }
     }

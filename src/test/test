@@ -1,9 +1,8 @@
 addi R1 R1 5
 addi R2 R2 7
 sub R3 R1 R2
-BNE R1 R1 2
+j 7
 addi R1 R1 5
 addi R2 R2 7
 muli R1 R1 5
 ori R2 R2 12
-andi R2 R2 0

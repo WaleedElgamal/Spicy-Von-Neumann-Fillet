@@ -16,7 +16,7 @@ public class ALU {
             case 5: return (val1 & val2);
             case 6: case 7: return (val1 | val2);
             case 8: return (val1 << val2);
-            case 9: return (val1 >>> val2);
+            case 9: return (val1 >> val2);
         }
         return -1; //?
     }
