@@ -129,6 +129,8 @@ public class Instruction {
             case 3:
             case 5:
             case 6:
+            case 10:
+            case 11:
                 tempValue = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
                 break;
             case 4:
@@ -149,10 +151,10 @@ public class Instruction {
             case 9:
                 tempValue = alu.execute(opcode, valR2, shamt); //sll,srl
                 break;
-            case 10:
+           /* case 10:
             case 11:
                 tempValue = alu.execute(opcode, valR2, immediate); //storing summation in both in valR2
-                break;
+                break;*/  //repeated statement
             //default: break;
         }
     }

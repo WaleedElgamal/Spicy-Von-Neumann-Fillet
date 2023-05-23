@@ -192,9 +192,7 @@ public class Processor {
                     else{
                         temp = String.format("%18s", temp).replaceAll(" ", "0");
                     }
-                    System.out.println(temp);
                     res += temp;
-                    System.out.println(res);
                 }
             }
             memory.setMainMemory(new BigInteger(res, 2).intValue(),i);
@@ -311,9 +309,9 @@ public class Processor {
             }
             processor.pipelineSeq();
             clockCycle++;
-//            if(processor.currentInstructions.size()==0){
-//                break;
-//            }
+            if(processor.currentInstructions.size()==0){
+                break;
+            }
         }
 
         System.out.println("Register contents after last clock cycle: \n" +
