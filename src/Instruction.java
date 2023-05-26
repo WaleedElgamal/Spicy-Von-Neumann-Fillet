@@ -134,7 +134,7 @@ public class Instruction {
                 tempValue = alu.execute(opcode, valR2, immediate); //multi,addi, andi, ori
                 break;
             case 4:
-                tempValue = alu.execute(opcode, valR2, immediate); //bne i
+                tempValue = alu.execute(opcode, valR1, valR2); //bne i
                 if (tempValue != 0) {
                     int currPCValue = pc;  //registerFile.getPc();
                     tempValue = alu.execute(0, currPCValue, immediate);

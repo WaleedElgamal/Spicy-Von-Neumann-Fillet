@@ -270,7 +270,7 @@ public class Processor {
             else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
                 prints[2] = "Instruction " + (inst.getInstructionID()) ;
                 stages[2] = inst;
-                prints[2] +=  ". Parameters: " + inst.printInstruction();
+                prints[2] +=  ". Input Parameters: " + inst.printInstruction();
             } else if (inst.getStage()[3] == 1) {
                 prints[3] = "Instruction " + (inst.getInstructionID()) ;
                 stages[3] = inst;
@@ -301,7 +301,7 @@ public class Processor {
         currentInstructions.add(instruction);
     }
 
-    public static void main(String[] args) throws IOException{ //TODO will we be given the clock cycle/ instruction count?
+    public static void main(String[] args) throws IOException{
         Processor processor = new Processor();
         processor.parseFileIntoMemory(processor.mainMemory);
         int numOfClockCycles = 7 + ((processor.numOfInstructions-1)*2);
@@ -320,6 +320,7 @@ public class Processor {
             else {
                 processor.nextStageWithoutFetch();
             }
+
             processor.pipelineSeq();
             clockCycle++;
         }
