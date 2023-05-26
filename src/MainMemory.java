@@ -5,6 +5,9 @@ public class MainMemory {
         mainMemory = new int[2048];
     }
 
+    public int[] getMainMemory(){
+        return mainMemory;
+    }
     public int getMainMemory(int i)
     {
         return mainMemory[i];
@@ -12,6 +15,6 @@ public class MainMemory {
 
     public void setMainMemory(int value, int position)
     {
-        mainMemory[position]=value;
+        mainMemory[position] = value;
     }
 }
