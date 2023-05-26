@@ -45,7 +45,7 @@ public class Processor {
             {
                 stage = "decode";
                 currentInstructions.get(i).decode(registers);
-                if(i>0 && currentInstructions.get(i-1).opcode!=11){
+                if(i>0 && currentInstructions.get(i-1).r1!=0 && currentInstructions.get(i-1).opcode!=11 && currentInstructions.get(i-1).opcode!=4&& currentInstructions.get(i-1).opcode!=7){ //not jump or bne or lw
                     if (currentInstructions.get(i).r1 == currentInstructions.get(i-1).r1){
                         currentInstructions.get(i).valR1 = currentInstructions.get(i-1).tempValue;
                     }
@@ -114,13 +114,23 @@ public class Processor {
                 stage = "execute";
                 currentInstructions.get(i).setStage(2,1);
                 currentInstructions.get(i).setStage(1,-1);
+                if(i>0 && currentInstructions.get(i-1).opcode==10){
+                    if (currentInstructions.get(i).r1 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR1 = currentInstructions.get(i-1).tempValue;
+                    }
+                    if(currentInstructions.get(i).r2 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR2 = currentInstructions.get(i-1).tempValue;
+                    }
+                    if (currentInstructions.get(i).r3 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR3 = currentInstructions.get(i-1).tempValue;
+                    }
+                }
             }
             else if(currentInstructions.get(i).getStage()[3]==0) // Memory cycle 1
             {
                 if (currentInstructions.get(i).isFlush()) {
                     currentInstructions.get(i).setFlush(false);
                     flushInstructions();
-
                 }
                 currentInstructions.get(i).setStage(2, -1);
                 currentInstructions.get(i).setStage(3, 1);
@@ -144,6 +154,7 @@ public class Processor {
             }
             if(stage!="")
             {
+
                 instDetails += stage + " stage";
                 System.out.println(instDetails);
             }
@@ -260,12 +271,12 @@ public class Processor {
             } else if (inst.getStage()[1] == 1  ) {
                 prints[1] = "Instruction " + (inst.getInstructionID()) ;
                 stages[1] = inst;
-               // prints[1] += inst.printInstruction();TODO make a method for the first cycle that prints all maybe
+                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.instruction;
             }
             else if (inst.getStage()[1] == 2) { //FIXME I added forstage of [1]==2 so we can test run without null pointer exception
                 prints[1] = "Instruction " + (inst.getInstructionID()) ;
                 stages[1] = inst;
-                // prints[1] += inst.printInstruction();
+                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.instruction;
             }
             else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
                 prints[2] = "Instruction " + (inst.getInstructionID()) ;
@@ -274,11 +285,11 @@ public class Processor {
             } else if (inst.getStage()[3] == 1) {
                 prints[3] = "Instruction " + (inst.getInstructionID()) ;
                 stages[3] = inst;
-                prints[3] += ". Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
+                prints[3] += ". Input Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
             } else if (inst.getStage()[4] == 1) {
                 prints[4] = "Instruction " + (inst.getInstructionID()) ;
                 stages[4] = inst;
-                prints[4] += ". Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
+                prints[4] += ". Input Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
             }
         }
         for(int i=0; i<5; i++){
