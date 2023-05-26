@@ -271,12 +271,12 @@ public class Processor {
             } else if (inst.getStage()[1] == 1  ) {
                 prints[1] = "Instruction " + (inst.getInstructionID()) ;
                 stages[1] = inst;
-                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.instruction;
+                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.getInstruction();
             }
             else if (inst.getStage()[1] == 2) { //FIXME I added forstage of [1]==2 so we can test run without null pointer exception
                 prints[1] = "Instruction " + (inst.getInstructionID()) ;
                 stages[1] = inst;
-                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.instruction;
+                prints[1] += ". Input Parameters: " + "INSTRUCTION: " + inst.getInstruction();
             }
             else if (inst.getStage()[2] == 1 || inst.getStage()[2] == 2) {
                 prints[2] = "Instruction " + (inst.getInstructionID()) ;
@@ -291,7 +291,9 @@ public class Processor {
             } else if (inst.getStage()[4] == 1) {
                 prints[4] = "Instruction " + (inst.getInstructionID()) ;
                 stages[4] = inst;
-                prints[4] += ". Input Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
+                prints[4] += ". Input Parameters: " + "VALUE: " + inst.getTempValue();
+                if(inst.getOpcode()!=4 && inst.getOpcode()!=7)
+                     prints[4] += ", REGISTER: R" + inst.getR1();
             }
         }
         for(int i=0; i<5; i++){
