@@ -285,7 +285,9 @@ public class Processor {
             } else if (inst.getStage()[3] == 1) {
                 prints[3] = "Instruction " + (inst.getInstructionID()) ;
                 stages[3] = inst;
-                prints[3] += ". Input Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
+                prints[3] += ". Input Parameters: " + "VALUE: " + inst.getTempValue();
+                if(inst.getOpcode()!=4 && inst.getOpcode()!=7)
+                    prints[3] += ", REGISTER: R" + inst.getR1();
             } else if (inst.getStage()[4] == 1) {
                 prints[4] = "Instruction " + (inst.getInstructionID()) ;
                 stages[4] = inst;
