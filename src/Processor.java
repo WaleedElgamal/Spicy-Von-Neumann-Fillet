@@ -45,6 +45,17 @@ public class Processor {
             {
                 stage = "decode";
                 currentInstructions.get(i).decode(registers);
+                if(i>0 && currentInstructions.get(i-1).opcode!=11){
+                    if (currentInstructions.get(i).r1 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR1 = currentInstructions.get(i-1).tempValue;
+                    }
+                    if(currentInstructions.get(i).r2 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR2 = currentInstructions.get(i-1).tempValue;
+                    }
+                    if (currentInstructions.get(i).r3 == currentInstructions.get(i-1).r1){
+                        currentInstructions.get(i).valR3 = currentInstructions.get(i-1).tempValue;
+                    }
+                }
                 currentInstructions.get(i).setStage(1,2);
             }
             else if(currentInstructions.get(i).getStage()[2]==1) // Execute cycle 2
@@ -116,7 +127,6 @@ public class Processor {
                 stage = "memory";
                 if (currentInstructions.get(i).opcode == 10 || currentInstructions.get(i).opcode == 11) {
                     int memAddress = currentInstructions.get(i).tempValue;
-                    System.out.println("temp Value: " + memAddress);
                     int oldMemValue = mainMemory.getMainMemory(memAddress);
                     currentInstructions.get(i).memory(mainMemory, registers); //wrong types?
                     int newMemValue = mainMemory.getMainMemory(memAddress);
@@ -235,6 +245,9 @@ public class Processor {
 
     private void pipelineSeq()
     {
+        if(currentInstructions.size()==0)
+            return;
+
         String[] prints = new String[5];
         Instruction[] stages = new Instruction[5];
 
@@ -261,11 +274,11 @@ public class Processor {
             } else if (inst.getStage()[3] == 1) {
                 prints[3] = "Instruction " + (inst.getInstructionID()) ;
                 stages[3] = inst;
-                prints[3] += ". Parameters: " + inst.printInstruction();
+                prints[3] += ". Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
             } else if (inst.getStage()[4] == 1) {
                 prints[4] = "Instruction " + (inst.getInstructionID()) ;
                 stages[4] = inst;
-                prints[4] += ". Parameters: " + inst.printInstruction();
+                prints[4] += ". Parameters: " + "VALUE: " + inst.tempValue + ", REGISTER: R" + inst.r1;
             }
         }
         for(int i=0; i<5; i++){
@@ -294,7 +307,7 @@ public class Processor {
         int numOfClockCycles = 7 + ((processor.numOfInstructions-1)*2);
         int clockCycle = 1;
 
-        while(clockCycle<=numOfClockCycles){
+        while(processor.mainMemory.getMainMemory(processor.pc)!=0 || processor.currentInstructions.size()!=0){
             System.out.println("-----CURRENT CLOCK CYCLE: " + clockCycle);
             if(clockCycle%2==1) {
                 if (processor.currentInstructions.size() < 5) {//TODO ask ta that this should automatically be satisfied{
@@ -309,9 +322,6 @@ public class Processor {
             }
             processor.pipelineSeq();
             clockCycle++;
-            if(processor.currentInstructions.size()==0){
-                break;
-            }
         }
 
         System.out.println("Register contents after last clock cycle: \n" +
